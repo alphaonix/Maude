@@ -1,0 +1,23 @@
+fmod Str is protecting NAT . protecting STRING .
+
+*** "49ers 39 Giants 38" tam = 18 para "49ers - Giants 39-38" tam = 20
+
+op converte : String -> String .
+
+vars C C' : String .
+
+
+*** eq converte(C) = substr(C,0,find(C," ",0)) .
+
+*** 38 -> eq converte(C) = substr(C,16,rfind(substr(C,0,16)," ",length(C))) .
+
+*** Giants -> eq converte(C) = substr(C,find(C," ",0) + 2 + length(substr(C,find(C," ",0) + 1,find(substr(C,find(C," ",0) + 1,find(C," ",0))," ",0))),find(substr(C,find(C," ",0) + 2 + length(substr(C,find(C," ",0) + 1,find(substr(C,find(C," ",0) + 1,find(C," ",0))," ",0))),find(C," ",0) + 2)," ",0)) .
+
+*** 39 -> eq converte(C) = substr(C,find(C," ",0) + 1,find(substr(C,find(C," ",0) + 1,find(C," ",0))," ",0)) .
+
+*** 49ers -> eq converte(C) = substr(C,0,find(C," ",0)) .
+
+*** eq converte(C) = substr(C,0,5) + " - " + substr(C,9,6) + " " + substr(C,6,2) + "-" + substr(C,16,2) .
+
+endfm
+

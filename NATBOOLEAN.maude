@@ -1,0 +1,12 @@
+fmod NAT-BOOLEAN is
+sort Boolean .
+ops T F : -> Boolean [ctor] .
+op not_ : Boolean -> Boolean [prec 1] .
+op _and_ : Boolean Boolean -> Boolean [prec 2] .
+op _or_ : Boolean Boolean -> Boolean [prec 3] .
+
+var B : Boolean .
+eq not F = T . eq not T = F .
+eq T and B = B . eq F and B = F .
+eq T or B = T . eq F or B = B .
+endfm

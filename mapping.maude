@@ -1,0 +1,26 @@
+mod MAPPING is protecting NAT + STRING .
+	sorts Policy Slice Status .
+	subsort Policy < Slice .
+	op empty : -> Slice [ctor] .
+	op _ _ : Slice Slice -> Slice [ctor assoc comm id: empty] .
+
+	op nwS : String Nat Nat Status -> Policy [ctor] .
+	ops init policy1 policy2 policy3 : -> Status [ctor] .
+	
+	var X : String . vars M N : Nat . vars S : Status .
+	
+	crl [policy1] :
+		nwS(X, N, M, S) => nwS(X, N, M, policy1)
+		if (N >= 20 and N <= 60 or N == 0) /\ (M >= 1 and M <= 4) .
+	
+	crl [policy2] :
+		nwS(X, N, M, S) => nwS(X, N, M, policy2)
+		if (N >= 50 and N <= 100 or N == 0) /\ (M >= 2 and M <= 5) .
+	
+	crl [policy3] :
+		nwS(X, N, M, S) => nwS(X, N, M, policy3)
+		if (X == "deep edge" or X == "edge" or X == "Regional DC" or X == "") /\ (M >= 1 and M <= 3) .
+endm
+	*** search [1] nwS("", 25, 2, init) =>* nwS("", 25, 2, policy1) .
+
+	*** search [1] person("teste1",23,engaged("teste2")) person("teste2",20,engaged("teste1")) =>* person("teste1",25,married(2,"teste2")) person("teste2",22,married(2,"teste1")) .

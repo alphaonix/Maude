@@ -1,0 +1,12 @@
+load QidList.maude
+
+view QidList from TRIV to QID-LIST is
+sort Elt to QidList .
+endv
+
+fmod QID-MYSET is
+	protecting QID-LIST .
+	sort TableLine .
+	protecting SET{QidList} * (sort NeSet{QidList} to NeQidSetTable, 
+                   sort Set{QidList} to SetTable) . 
+endfm

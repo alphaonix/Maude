@@ -1,0 +1,60 @@
+***(
+ ----------------------------
+ PART 1 : Functional modules
+ ----------------------------
+
+ This is a simple example of a functional module that uses the mixfix notation.
+ Remember that:
+ - fmod : defines a functional module (an equational theory)
+ - sort X : defines a new sort X
+ - op if_then_else_fi : defines a ternary operator (_ means the position for 
+   an argument)
+ - var X : S . : defines a logical variable (of type/sort S)
+ - eq f(X) = g(X) . : is an equation that, operationally, defines a left to 
+   right simplification rule (semantically, an equation if the executability 
+   conditions are met). 
+ - The previous equation requires X to be defined with the appropriate sort
+ - the equation f(X) = g(X) must be understood as "for all X:Sort, f(X) = g(X)"
+
+ Have in mind that:
+  - your equational theory must be confluent and terminating
+  - the command "red T ." (or "reduce T ." ) will find the (unique) normal form 
+    of T
+  - The attribute [ctor] is only a "comment" to know that the operator is a
+    constructor for the datatype. 
+
+The following example defines the natural numbers with the usual constructors :
+zero and successor. It also defines arithmetic operations + on NAT. 
+***)
+
+fmod NATURAL is
+    sort Natural . --- Type / Sort
+    --- Constructors for the data type
+    op zero : -> Natural [ctor] .
+    op suc : Natural -> Natural [ctor] .
+
+    --- Functions/operations on Natural Numbers
+    op _+_ : Natural Natural -> Natural .
+
+    --- Logical Variables
+    vars N M : Natural .
+
+    --- Defining equations for Plus
+    eq N + zero = N . --- base case
+    eq N + suc(M) = suc(N + M) . --- recursive case
+
+endfm
+
+***(
+ At this point, you can interact with the (functional) module above by typing
+ "maude part-1".
+
+ Test the following commands 
+
+    red suc(zero) + suc(suc(zero)) .
+    red suc(zero) + suc(zero) == suc(suc(zero)) .
+
+ The last command uses the automatically defined predicate "t == t'" that test
+ if the canonical forms of t and t' are the same
+***)
+

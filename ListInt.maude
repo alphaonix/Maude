@@ -1,0 +1,67 @@
+fmod LIST-INT is protecting INT .
+
+sorts List NeList . subsorts Int < NeList < List .
+
+op nil : -> List [ctor] .
+op _ _ : List List -> List [assoc id: nil ctor] .
+op _ _ : NeList NeList -> NeList [assoc id: nil ctor] .
+op length : List -> Nat .                 *** OK
+ops first last : NeList -> Int .          *** OK
+op empty? : List -> Bool .		      *** OK
+op rest : NeList -> List .	               *** OK
+op reverse : List -> List .               *** OK
+op _occursIn_ : Int List -> Bool .        *** OK
+op max : NeList -> Int .                  *** OK
+op isSorted : List -> Bool .              *** NOT OK
+op occursInAux : Int NeList -> Nat .      *** OK
+op cbIn : Int Int List -> Bool .          *** OK
+op _>lex_ : List List -> Bool .           *** OK
+
+vars I I' J : Int . var L L' : List .
+
+eq length(nil) = 0 .
+eq length(I L)= 1 + length(L) .
+
+eq first(nil) = nil .
+eq first(I L) = I .
+
+eq last(nil) = nil .
+eq last(L I) = I .
+
+eq I occursIn nil = false .
+eq I occursIn J L = (I == J) or (I occursIn L) .
+
+eq reverse(nil) = nil .
+eq reverse(L I) = I reverse(L) . 
+
+eq empty?(nil) = true .
+eq empty?(L I) = false .
+
+eq rest(nil) = nil .
+eq rest(I L) = L .
+
+eq max(nil) = 0 .
+ceq max(L I) = max(L) if max(L) > I = true .
+ceq max(L I) = I if max(L) > I = false . 
+
+eq occursInAux(I, nil) = 0 .
+eq occursInAux(I, L I) = s(occursInAux(I, L)) .
+ceq occursInAux(I, L I') = occursInAux(I, L) if (I =/= I') .
+
+eq cbIn(I, J, nil) = false .
+eq cbIn(I, J, I') = false .
+ceq cbIn(I, J, I' L) = cbIn(I, J, L) if (I' =/= I) and (I' =/= J) .
+eq cbIn(I, J, J L) = false .
+eq cbIn(I, J, I L) = (J occursIn L) .
+
+eq isSorted(nil) = true .
+eq isSorted(L I I') = isSorted(L I) and (I <= I') .
+eq isSorted(nil I) = true .
+
+eq nil >lex (J L') = false .
+ceq (I L) >lex (J L') = true if I > J .
+eq (I L) >lex (I L') = L >lex L' .
+ceq (I L) >lex (J L') = false if I < J .
+eq (I L) >lex nil = true .
+
+endfm
