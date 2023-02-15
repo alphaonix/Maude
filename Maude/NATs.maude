@@ -1,0 +1,60 @@
+fmod NAT< is
+	
+protecting NAT-ADD . protecting NAT-BOOLEAN .
+
+op _<_ : Nat Nat -> Boolean .
+op half : Nat -> Nat .
+op _monus_ : Nat Nat -> Nat .
+op diff : Nat Nat -> Nat .
+ops odd even : Nat -> Boolean .
+ops _<=_ _>_ _>=_ _==_ : Nat Nat -> Boolean .
+
+vars M N : Nat .
+
+eq 0 < s(M) = T .
+eq M < 0 = F .
+eq s(M) < s(N) = M < N .
+
+eq diff(0 , M) = M .
+eq diff(M , 0) = M .
+eq diff(s(M) , s(N)) = diff(M, N) .
+
+eq half(0) = 0 .
+eq half(s(0)) = 0 .
+eq half(s(s(M))) = half(M) + s(0) .
+
+eq 0 monus M = 0 .
+eq N monus 0 = N .
+eq s(N) monus s(M) = N monus M .
+
+eq even(0) = T .
+eq even(s(0)) = F .
+eq odd(0) = F .
+eq odd(s(0)) = T .
+
+eq even(s(s(M))) = even(M) .
+eq odd(s(s(M))) = odd(M) .
+
+
+eq 0 <= s(M) = T .
+eq 0 <= 0 = T .
+eq s(M) <= 0 = F .
+eq s(M) <= s(N) = (M <= N) .
+
+eq 0 > M = F .
+eq s(M) > 0 = T .
+eq s(M) > s(N) = (M > N) .
+
+eq 0 == 0 = T .
+eq s(M) == 0 = F .
+eq 0 == s(M) = F .
+eq s(M) == s(N) = (M == N) .
+
+eq 0 >= s(M) = F .
+eq 0 >= 0 = T .
+eq s(M) >= 0 = T .
+eq s(M) >= s(N) = (M >= N) .
+
+
+endfm
+

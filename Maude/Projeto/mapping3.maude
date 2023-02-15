@@ -1,0 +1,62 @@
+load StringList.maude
+load Table.maude
+
+mod MAPPING is protecting NAT + QID-MYSET + STRING-LIST .
+
+	sorts Range Status Object Configuration QidPair OptionString .
+	subsort Object < Configuration .
+	
+	op None : -> OptionString [ctor] .
+	op Some : String -> OptionString .
+	op none : -> Configuration [ctor] .
+	op _ _ : Configuration Configuration -> Configuration [ctor assoc comm id: none] .
+	op [_, _] : Nat Nat -> Range .
+	op [_, _] : Qid QidList -> TableLine [ctor] . 
+	
+	op <_: nwSS | placement:_ dataRateDL:_ e2eLatency:_> : Qid OptionString Nat Nat -> Object [ctor] .
+	op <_: nwS | placement:_ dataRateDL:_ e2eLatency:_> : Qid String Nat Nat -> Object [ctor] .
+	op <_: csS | placement:_ dataRateDL:_ e2eLatency:_> : Qid String Nat Nat -> Object [ctor] .
+	op <_: policy | placement:_ dataRateDL:_ e2eLatency:_> : Qid StringList Range Range -> Object [ctor] .
+	*** op <_: result | MatchedPolicies:_> : Qid QidList -> Object [ctor] .
+	op <_: tab | Table:_> : Qid SetTable -> Object [ctor] .
+	
+	vars X Z Z' Y Y' C C' : Qid .
+	vars X' H O O' : String .
+	var L L' : StringList .
+	vars T T' : SetTable .
+	vars J J' : QidPair .
+	vars M N M' N' M'' N'' : Nat .
+	vars P P' : OptionString .
+
+	op unwarp(_) : OptionString -> String .
+	
+	eq unwarp(Some(O)) = O .
+
+	crl [Policy-Slice-Option] :
+	
+		< X : nwSS | placement: P dataRateDL: M e2eLatency: N >
+		< Y : policy | placement: L dataRateDL: [M', N'] e2eLatency: [M'', N''] >
+		< Z : tab | Table: T >		
+	=>
+		< X : nwSS | placement: P dataRateDL: M e2eLatency: N >
+		< Y : policy | placement: L dataRateDL: [M', N'] e2eLatency: [M'', N''] >
+		< Z : tab | Table: insert(Y, T) >
+		
+		if M >= M' /\ M <= N' /\ N >= M'' /\ N <= N'' /\ not (Y in T) /\ (P =/= None and occurs(unwarp(P), L)) .
+		
+	op configs : -> Configuration [ctor] .
+	
+	eq configs = < 'Table1 : tab | Table: empty >
+		   < 'NwSlice1 : nwSS | placement: Some("edge") dataRateDL: 25 e2eLatency: 2 >
+	             < 'Policy1 : policy | placement: "" "edge" dataRateDL: [25, 60] e2eLatency: [1, 4] >
+	             < 'Policy2 : policy | placement: "deep edge" "edge" "Regional DC" dataRateDL: [0, 100] e2eLatency: [1, 3] >
+	             < 'Policy3 : policy | placement: "" "edge" dataRateDL: [25, 60] e2eLatency: [1, 4] >
+	             < 'Policy4 : policy | placement: "deep edge" "edge" "Regional DC" dataRateDL: [0, 100] e2eLatency: [1, 3] >
+	             < 'Policy5 : policy | placement: "deep edge" "Regional DC" dataRateDL: [0, 100] e2eLatency: [1, 3] > .
+endm
+	*** frew [1] configs . 
+	*** if E == E' then true else occurs(E, L) fi
+	*** append(A, L) = A L . 
+	*** op occurs : X$Elt List {X} -> Bool . 
+	*** eq occurs(E, nil) = false . 
+	*** eq occurs(E, E' L) = if E == E' then true else occurs(E, L) fi .

@@ -1,0 +1,60 @@
+load QidList.maude
+load t.maude
+load StringList.maude
+
+mod MAPPING is protecting NAT + QID-LIST + STRING-LIST .
+
+	sorts Range Status Object Configuration QidPair .
+	subsort Object < Configuration .
+	
+	op none : -> Configuration [ctor] .
+	op _ _ : Configuration Configuration -> Configuration [ctor assoc comm id: none] .
+	op [_, _] : Nat Nat -> Range .
+	op [_, _] : Qid Qid -> QidPair [ctor] . 
+	
+	op <_: nwS | placement:_ dataRateDL:_ e2eLatency:_> : Qid String Nat Nat -> Object [ctor] .
+	op <_: csS | placement:_ dataRateDL:_ e2eLatency:_> : Qid String Nat Nat -> Object [ctor] .
+	op <_: policy | placement:_ dataRateDL:_ e2eLatency:_> : Qid String Range Range -> Object [ctor] .
+	op < result | MatchedPolicies:_> :  QidList -> Object [ctor] .
+	
+	vars X Z Z' Y Y' C C' : Qid .
+	vars X' H O O' : String .
+	vars T T' : QidList .
+	vars M N M' N' M'' N'' : Nat .
+
+	crl [Policy-Slice] :
+	
+		< X : nwS | placement: O dataRateDL: M e2eLatency: N >
+		< Y : policy | placement: H dataRateDL: [M', N'] e2eLatency: [M'', N''] >
+		< result | MatchedPolicies: T >
+	=>
+		< X : nwS | placement: O dataRateDL: M e2eLatency: N >
+		< Y : policy | placement: H dataRateDL: [M', N'] e2eLatency: [M'', N''] >
+		< result | MatchedPolicies: append(T , Y) >
+
+		if M >= M' /\ M <= N' /\ N >= M'' /\ N <= N'' /\ not (occurs(Y , T)) /\ (P =/= None and occurs(unwarp(P), L)) /\ (size(T) <= 2) .
+		
+	crl [Policy-Service] :
+	
+		< X : csS | placement: O dataRateDL: M e2eLatency: N >
+		< Y : policy | placement: H dataRateDL: [M', N'] e2eLatency: [M'', N''] >
+	=>
+		< X : csS | placement: O dataRateDL: M e2eLatency: N >
+		< Y : policy | placement: H dataRateDL: [M', N'] e2eLatency: [M'', N''] >
+		
+		if M >= M' /\ M <= N' /\ N >= M'' /\ N <= N'' .
+		
+	op configs : -> Configuration [ctor] .
+	
+	eq configs = < result | MatchedPolicies: nil >
+		   < "NwSlice1" : nwS | placement: "b" dataRateDL: 25 e2eLatency: 2 > 
+	             < "Policy1" : policy | placement: "a" dataRateDL: [25, 60] e2eLatency: [1, 4] >
+	             < "Policy2" : policy | placement: "b" dataRateDL: [50, 100] e2eLatency: [2, 5] >
+	             < "Policy3" : policy | placement: "b" dataRateDL: [0, 100] e2eLatency: [1, 3] > .
+endm
+	*** frew [1] configs . 
+	*** if E == E' then true else occurs(E, L) fi
+	*** append(A, L) = A L . 
+	*** op occurs : X$Elt List {X} -> Bool . 
+	*** eq occurs(E, nil) = false . 
+	*** eq occurs(E, E' L) = if E == E' then true else occurs(E, L) fi .

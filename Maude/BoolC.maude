@@ -1,0 +1,14 @@
+fmod BoolC is protecting RAT . protecting INT . protecting FLOAT . protecting BOOL .
+
+op _and-then_ : Bool Bool -> Bool .
+op _or-else_ : Bool Bool -> Bool .
+
+vars B : Bool .
+
+eq true and-then B = B .
+eq false and-then B = false .
+
+eq true or-else B = true .
+eq false or-else B = B .
+
+endfm

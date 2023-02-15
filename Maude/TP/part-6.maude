@@ -1,0 +1,136 @@
+***(
+--- ---------------
+--- Modules : Rules
+--- ---------------
+
+ Now we model the asynchronous transmission of the blocks. For that, we shall
+ use messages (sort Msg) which is a subsort of Configuration (like objects).
+ Also, as a model of failures, messages can be lost. The sender keeps the
+ counting of the times a block has been (re)transmitted. 
+
+ ***)
+
+mod FILE-TRANSFER is
+    --- Some definitions that make easier the definition of distributed object systems
+    pr CONFIGURATION .
+    pr LIST{Nat} .
+
+    --- ------------------------
+    var n     : Nat .
+    var b     : Nat .
+    vars L L' : List{Nat} .
+    var  C    : Configuration .
+    var  M    : Msg .
+    --- ------------------------
+
+    op Sender : -> Cid [ctor] . --- The identifier of a class
+    op Receiver : -> Cid [ctor].
+
+    --- The identifiers for the objects of the system
+    ops S R : -> Oid [ctor] .
+
+    --- An attribute for defining the state of the objects
+    op file:_ : List{Nat} -> Attribute [ctor] .
+    op count:_ : Nat       -> Attribute [ctor] . --- counter 
+    op current:_ : Nat      -> Attribute [ctor] . --- current block being transmitted 
+
+    --- An object is a term of the shale < o : C | at1, ..., atn >
+    --- A configuration is a multiset of objects (empty syntax)
+
+    --- In a configuration, we may also have messages. Here the actual
+    --- definition in the prelude
+    --- subsort Object Msg Portal < Configuration .
+
+    op send-msg : Nat -> Msg [ctor] . --- sending a new block
+    op ack-msg :  Nat -> Msg [ctor] . --- acknowledgment 
+
+
+    --- Generating the list 1 2 3 4 ... n
+    op generate-blocks : Nat -> List{Nat} .
+    eq generate-blocks(0) = nil .
+    eq generate-blocks(s(n)) = generate-blocks(n) n .
+
+    --- The initial state of the system
+    op init-state : Nat -> Configuration .
+    eq init-state(n) = < S : Sender   | file: generate-blocks(n), count: 0 >
+                       < R : Receiver | file: nil >
+                       .
+
+    --- Ready to send a new message. Note that the attribute current is not 
+    --- part of the LHS but it appears in the RHS
+    rl [ready] : < S : Sender  | file: (b L),  count: n >
+                =>
+                < S : Sender   | file:    L ,  count: n, current: b   >
+                .
+
+    --- creating the message (modeling sending a message through the network)
+    --- this rule "creates" the message send-msg(b) for the current block b
+    rl [send] : < S : Sender   | file:    L , count: n, current: b   >
+                =>
+                < S : Sender   | file:    L , count: (n + 1), current: b  >
+                send-msg(b) 
+                .
+
+    --- receiving a message and sending the ack
+    --- this rule 'consumes' a message 
+    rl [recv] : send-msg(b)
+                < R : Receiver | file:   L' >
+                =>
+                ack-msg(b)
+                < R : Receiver | file:  
+                                        if occurs(b, L')  --- don't copy twice the same message
+                                        then L'
+                                        else 
+                                        L' b
+                                        fi
+                                        >
+                .
+
+    --- Receiving the ack
+    rl [ack] : ack-msg(b)
+               < S : Sender   | file:    L , count: n, current: b   >
+               =>
+               < S : Sender   | file:    L , count: n   >
+               .
+
+    --- messages can be lost during transit
+    rl [fail] : send-msg(b) => none .
+    rl [fail] : ack-msg(b) => none .
+
+endm
+
+***( 
+ Try the following commands
+
+--- The initial state
+red init-state(5) .
+
+--- Final configuration (=>! find normal forms)
+search [5] init-state(5) =>! C .
+
+--- Note that there are infinitely many solutions! In all canonical form, the
+--- file is empty in the sender (and properly copied in the receiver). However, the
+--- sender may end with n>=5 number of retransmissions. 
+
+--- Indeed, we may observe configurations with a unbounded number of messages
+search [1] init-state(5) =>* ack-msg(2) ack-msg(2) C .
+
+Use 
+show path 491 .
+
+to see the rewrittings needed to obtain the configuration with 2 ack-msg(2)
+messages
+
+In this particular case, we can add the following equation : 
+eq M M = M .
+
+And the search above will never end (since the system continues to be
+infinite-state)
+
+We can ask if the protocol can finish in 5 steps:
+
+search [1] init-state(5) =>*   C  < S : Sender   | file:    nil , count: n   > such that n == 5 .
+
+And this is of course the case when no failure occurs. 
+
+***)

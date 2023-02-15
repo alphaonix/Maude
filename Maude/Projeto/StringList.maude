@@ -1,0 +1,9 @@
+*** view String from TRIV to STRING is
+*** sort Elt to String .
+*** endv
+
+fmod STRING-LIST is
+	protecting LIST{String} * (sort NeList{String} to NeStringList, 
+                   sort List{String} to StringList) . 
+endfm
+

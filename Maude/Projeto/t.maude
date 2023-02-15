@@ -1,0 +1,7 @@
+fmod Q-LIST is
+    protecting QID .
+    sort QidList .
+    subsort Qid < QidList .
+    op nil : -> QidList .
+    op __ : QidList QidList -> QidList [assoc id: nil] .
+endfm

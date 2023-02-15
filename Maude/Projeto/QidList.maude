@@ -1,0 +1,11 @@
+*** load Qid.maude
+
+*** view Qid from TRIV to QID is
+*** sort Elt to Qid .
+*** endv
+
+fmod QID-LIST is
+	protecting QID .
+	protecting LIST{Qid} * (sort NeList{Qid} to NeQidList, 
+                   sort List{Qid} to QidList) . 
+endfm

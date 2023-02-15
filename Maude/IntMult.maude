@@ -1,0 +1,47 @@
+fmod MSET-INT is protecting INT .
+
+sorts Set NeSet .
+subsorts Int < NeSet < Set .
+
+op empty : -> Set [ctor] . *** Empty multiset
+op _ _ : Set Set -> Set [ctor assoc comm id: empty] .
+op _ _ : NeSet Set -> NeSet [ctor assoc comm id: empty] .
+op mult : Int Set -> Nat .
+op delete : Int Set -> Set .
+op _in_ : Int Set -> Bool .
+op setMinus : Set Set -> Set .
+op intersect : Set Set -> Set [ assoc comm ] .
+op card : Set -> Nat .
+
+var I I' : Int . var MS MS' : Set .
+
+eq I I = I .
+
+eq card(empty) = 0 .
+*** eq card(I) = 1 .
+ceq card(I MS) = s(card(MS)) if not I in MS .
+ceq card(I MS) = card(MS) if I in MS .
+
+eq setMinus(empty, MS) = empty .
+eq setMinus(MS, empty) = MS .
+eq setMinus(I MS, I MS') = setMinus(MS, MS') .
+ceq setMinus(I MS, MS') = I setMinus(MS, MS') if not(I in MS') .
+
+eq intersect(MS, empty) = empty .
+eq intersect(I MS, I MS') = intersect(MS, MS') I .
+ceq intersect(I MS, MS') = intersect(MS, MS') if not(I in MS') .
+
+*** eq delete(I, empty) = empty .
+*** ceq delete(I, MS I') = delete(I, MS) I' if (I == I') = false .
+*** ceq delete(I, MS I') = delete(I, MS) if (I == I') = true .
+
+eq delete(I, I MS) = delete(I, MS) .
+ceq delete(I, MS) = MS if not (I in MS) .
+
+eq I in MS = mult(I, MS) > 0 .
+
+eq mult(I, empty) = 0 .
+eq mult(I, MS I) = s(mult(I, MS)) .
+ceq mult(I, MS I') = mult(I, MS) if (I =/= I') .
+
+endfm
