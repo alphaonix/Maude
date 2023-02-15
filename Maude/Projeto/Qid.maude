@@ -1,5 +1,0 @@
-fmod QID is protecting STRING .
- sort Qid .
- subsort String < Qid .
-  
-endfm

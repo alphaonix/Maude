@@ -1,8 +1,0 @@
-fmod NAT-SQUARE is protecting NAT-ADD .
-	op square : Nat -> Nat .
-	
-	vars M N : Nat .
-	
-	eq square(0) = 0 .
-	eq square(s(M)) = square(M) + M + M + s(0) .
-endfm
